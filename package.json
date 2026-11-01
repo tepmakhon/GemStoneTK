@@ -1,0 +1,26 @@
+{
+  "name": "takeo-gemstones-platform",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "overrides": {
+    "multer": "2.5.0",
+    "path-to-regexp": "8.4.2",
+    "postcss": "8.5.32"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace @takeo/web",
+    "dev:web": "npm run dev --workspace @takeo/web",
+    "dev:api": "npm run start:dev --workspace @takeo/api",
+    "build": "npm run build --workspaces --if-present",
+    "db:generate": "npm run generate --workspace @takeo/database",
+    "db:migrate": "npm run migrate:dev --workspace @takeo/database",
+    "db:deploy": "npm run migrate:deploy --workspace @takeo/database"
+  }
+}

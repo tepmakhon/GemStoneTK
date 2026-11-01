@@ -1,0 +1,15 @@
+node_modules/
+.next/
+dist/
+coverage/
+build/
+.turbo/
+.env
+.env.*
+!.env.example
+*.log
+apps/api/uploads/
+packages/database/src/generated/
+
+# Local PostgreSQL volume
+.data/
