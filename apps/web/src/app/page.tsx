@@ -5,7 +5,7 @@ export default function HomePage() {
         <a href="/" className="text-sm tracking-[0.12em]">TAKEO<br />NATURAL GEMSTONES</a>
         <nav aria-label="Main navigation" className="flex items-center gap-8 text-sm">
           <a href="/collection">Collection</a><a href="/about">Our story</a><a href="/contact">Contact</a>
-          <a href="/en">EN / ខ្មែរ</a><a href="/account">Account</a><a href="/cart">Bag</a>
+          <a href="/collection?locale=km">EN / ខ្មែរ</a>
         </nav>
       </header>
       <section className="mx-auto grid max-w-[1312px] gap-12 px-8 py-16 md:grid-cols-2 md:items-center md:py-24">

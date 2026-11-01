@@ -17,7 +17,8 @@
 - [x] Establish application workspaces and local development configuration.
 - [x] Draft PostgreSQL/Prisma schema, relationships, and initial indexes; create/review migration and constraints still pending.
 - [ ] Implement authentication, authorization, and admin access controls.
-- [ ] Implement catalog, media, inventory ledger, reservations, and physical-shop sale flow.
+- [x] Implement the first read-only catalog endpoints and collection/detail pages.
+- [ ] Implement product media delivery, transactional inventory ledger/reservations, and physical-shop sale flow.
 - [ ] Implement cart, checkout, orders, payment review, inquiries, and quotations.
 - [ ] Implement admin screens and spreadsheet import/reporting/settings.
 - [ ] Implement bilingual SEO-ready storefront matching desktop/mobile Figma screens.
@@ -27,7 +28,8 @@
 
 ## Foundation blockers
 
-- [ ] Start the local Docker daemon, create the PostgreSQL migration, and verify clean migrate/seed setup.
+- [x] Start local PostgreSQL on host port 5433 and apply the initial migration.
+- [ ] Verify clean database setup on a fresh volume and add only owner-verified seed/catalog data.
 - [ ] Resolve the three high and eighteen moderate npm audit findings without broad major-version upgrades; remove redundant direct Multer if possible and ensure the Nest upload adapter uses a patched release.
 - [ ] Add database constraints for session ownership (exactly one of customer/admin), nonnegative stock/reservation quantities, and integrity between a product and its primary media.
 - [ ] Keep the API health route as the only implemented API feature until real business modules are added; do not treat the current web shell as production UI.

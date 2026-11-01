@@ -38,4 +38,4 @@ Inventory is modeled as an auditable movement ledger plus expiring reservations.
 
 `OrderItem` and `QuotationItem` retain historical descriptive and pricing snapshots so later catalog edits do not rewrite customer history. `SiteSetting` stores configurable currency/business configuration as JSON, with access and audit policy enforced by the API.
 
-This is an initial schema baseline, not a claim of a migration-tested production model. Constraint and transaction refinements belong with the first database migration and service implementation.
+The initial migration has been applied to the local PostgreSQL database. This is still a first schema baseline, not a production-validated data model. Constraint and transaction refinements belong with the inventory/order service implementation.

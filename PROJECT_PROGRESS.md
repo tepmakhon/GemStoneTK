@@ -44,13 +44,18 @@ See [REQUIREMENTS_TRACEABILITY.md](./REQUIREMENTS_TRACEABILITY.md) for the requi
 
 ## Phase 2 — architecture and foundation
 
-**Status: foundation scaffolded; first database migration is blocked on the local Docker daemon.**
+**Status: foundation and first read-only catalog slice implemented; commerce workflows remain outstanding.**
 
 - Added a modular-monolith architecture decision, system architecture, initial ERD, README, npm workspaces, a Next.js storefront shell, NestJS API shell, Prisma/PostgreSQL schema, local Compose database definition, and environment template.
 - The web home uses Figma-derived typography/color direction and no fabricated catalog inventory. The API implements only `GET /api/v1/health`; no business endpoint or feature is claimed as complete.
 - Prisma Client generation completed successfully. The production build completed successfully for both the Nest API and Next.js 15.5.28 web app (Next also checked TypeScript and generated static pages).
-- A local migration was not generated: Docker is installed, but its daemon was not running. Start Docker Desktop/daemon and run `docker compose up -d postgres`, then `npm run db:migrate`.
-- Dependency audit on 2026-11-01 reports **3 high and 18 moderate** findings (including transitive Multer/PostCSS advisories). These remain open and must be resolved before production. Direct Multer is pinned to 2.5.0, but a transitive Nest adapter still resolves 2.4.0; Next 15 has a vulnerable nested PostCSS. Several remaining findings are development tooling. See `TODO.md`.
+- Docker PostgreSQL runs on host port 5433 because port 5432 was already occupied. Initial migration `20261101160218_init` was created and applied successfully.
+- Added database-backed read-only `GET /api/v1/products`, `GET /api/v1/products/:sku`, and `GET /api/v1/categories` endpoints. They support locale, search, category, sort, and pagination; product response availability subtracts active reservations. No product or category seed data was added.
+- Connected `/collection` and `/products/[sku]` pages to the API and added `/about` and `/contact` informational pages. The catalog is currently empty, so the collection shows the reviewed-product empty state. Media delivery, cart, inquiry submission, and order actions remain unimplemented.
+- `npm run build` passes for the API and web application. Verified API health (200), empty product list (200), and empty categories (200); the storefront collection route renders the empty state. No workflow tests were added or run.
+- The latest full `npm audit` reports 22 advisories: **3 high, 18 moderate, and 1 low** (including transitive Multer/PostCSS advisories). These remain open before production. See `TODO.md`.
 - No workflow tests have been added or run. Build success validates compilation only, not business correctness, security, or production readiness.
+- Started the local Next.js and NestJS development servers. Verified the storefront collection route and API endpoints. The preview is available at `http://127.0.0.1:3000/collection`.
+- `git remote -v` is empty, and the connected GitHub repository search returned no matching TakeoGemstones/GemStone repository. There is no destination configured, so no GitHub push has happened.
 
 See [README.md](./README.md), [ARCHITECTURE.md](./ARCHITECTURE.md), and [docs/data-model.md](./docs/data-model.md).

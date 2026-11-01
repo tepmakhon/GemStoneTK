@@ -23,15 +23,15 @@ Requirements: Node.js 20.19 or later and Docker Compose.
 6. Start the API: `npm run dev:api`.
 7. In another terminal, start the web app: `npm run dev:web`.
 
-The local PostgreSQL password in Compose is for local development only. Never use it outside a developer machine. There is no seed dataset yet; production credentials, business contact details, bank information, and exchange rate must not be copied from Figma sample values.
+The local PostgreSQL password in Compose is for local development only. It maps to host port `5433` so it can run alongside another local PostgreSQL service on port 5432. Never use it outside a developer machine. There is no seed dataset yet; production credentials, business contact details, bank information, and exchange rate must not be copied from Figma sample values.
 
 ## Database
 
-The initial Prisma schema lives at `packages/database/prisma/schema.prisma`. Migrations are generated and reviewed through Prisma. `npm run db:deploy` applies committed migrations in a deployment environment. No migration is committed yet; create and review the first one when a database is available.
+The Prisma schema lives at `packages/database/prisma/schema.prisma`. The initial migration is `packages/database/prisma/migrations/20261101160218_init`. Migrations are generated and reviewed through Prisma. `npm run db:deploy` applies committed migrations in a deployment environment.
 
 ## API
 
-The API listens on port 4000 by default. The initial health endpoint is `GET /api/v1/health`. DTO validation, CORS origin, and URI versioning are configured in the Nest bootstrap. Swagger/OpenAPI is not wired yet.
+The API listens on port 4000 by default. Current read-only endpoints are `GET /api/v1/health`, `/api/v1/products`, `/api/v1/products/:sku`, and `/api/v1/categories`. DTO validation, CORS origin, and URI versioning are configured in the Nest bootstrap. Swagger/OpenAPI is not wired yet.
 
 ## Status and requirements
 
