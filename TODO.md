@@ -16,11 +16,12 @@
 - [ ] Record architecture decisions and repository/folder structure.
 - [x] Establish application workspaces and local development configuration.
 - [x] Draft PostgreSQL/Prisma schema, relationships, and initial indexes; create/review migration and constraints still pending.
-- [ ] Implement authentication, authorization, and admin access controls.
+- [x] Implement the first admin authentication/role-control slice (login/logout, persisted sessions, guarded overview and product-list endpoints).
+- [ ] Add authentication and authorization integration tests, rate limiting, recovery, and session management UI.
 - [x] Implement the first read-only catalog endpoints and collection/detail pages.
 - [ ] Implement product media delivery, transactional inventory ledger/reservations, and physical-shop sale flow.
 - [ ] Implement cart, checkout, orders, payment review, inquiries, and quotations.
-- [ ] Implement admin screens and spreadsheet import/reporting/settings.
+- [ ] Add product create/edit/archive, categories, inventory/shop sales, orders, payments, customers, inquiries/quotes, fulfillment, media, reports, settings, and spreadsheet import to the admin.
 - [ ] Implement bilingual SEO-ready storefront matching desktop/mobile Figma screens.
 - [ ] Add the unit, API, concurrency, import, and workflow tests listed in traceability; run them during implementation.
 - [ ] Write setup, API, admin, security, and deployment documentation.
@@ -30,6 +31,6 @@
 
 - [x] Start local PostgreSQL on host port 5433 and apply the initial migration.
 - [ ] Verify clean database setup on a fresh volume and add only owner-verified seed/catalog data.
-- [ ] Resolve the three high and eighteen moderate npm audit findings without broad major-version upgrades; remove redundant direct Multer if possible and ensure the Nest upload adapter uses a patched release.
+- [ ] Resolve the two high, four moderate, and one low npm audit findings reported by the latest dependency installation, without broad major-version upgrades; confirm Multer's production path is patched.
 - [ ] Add database constraints for session ownership (exactly one of customer/admin), nonnegative stock/reservation quantities, and integrity between a product and its primary media.
 - [ ] Keep the API health route as the only implemented API feature until real business modules are added; do not treat the current web shell as production UI.

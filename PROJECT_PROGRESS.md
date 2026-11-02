@@ -2,7 +2,7 @@
 
 ## Phase 1 — project and design inspection
 
-**Status: complete (inspection and planning only).** No application code has been changed.
+**Status: complete (inspection and planning only, as of the initial repository review).** Application code was added in subsequent phases.
 
 ### Repository
 
@@ -44,10 +44,10 @@ See [REQUIREMENTS_TRACEABILITY.md](./REQUIREMENTS_TRACEABILITY.md) for the requi
 
 ## Phase 2 — architecture and foundation
 
-**Status: foundation and first read-only catalog slice implemented; commerce workflows remain outstanding.**
+**Status: foundation, read-only customer catalog, and initial secure admin review slice implemented; commerce workflows remain outstanding.**
 
 - Added a modular-monolith architecture decision, system architecture, initial ERD, README, npm workspaces, a Next.js storefront shell, NestJS API shell, Prisma/PostgreSQL schema, local Compose database definition, and environment template.
-- The web home uses Figma-derived typography/color direction and no fabricated catalog inventory. The API implements only `GET /api/v1/health`; no business endpoint or feature is claimed as complete.
+- The storefront uses Figma-derived typography/color direction and no fabricated catalog inventory. The customer catalog API and admin review endpoints are implemented below; transactional commerce workflows remain outstanding.
 - Prisma Client generation completed successfully. The production build completed successfully for both the Nest API and Next.js 15.5.28 web app (Next also checked TypeScript and generated static pages).
 - Docker PostgreSQL runs on host port 5433 because port 5432 was already occupied. Initial migration `20261101160218_init` was created and applied successfully.
 - Added database-backed read-only `GET /api/v1/products`, `GET /api/v1/products/:sku`, and `GET /api/v1/categories` endpoints. They support locale, search, category, sort, and pagination; product response availability subtracts active reservations. No product or category seed data was added.
@@ -55,6 +55,17 @@ See [REQUIREMENTS_TRACEABILITY.md](./REQUIREMENTS_TRACEABILITY.md) for the requi
 - `npm run build` passes for the API and web application. Verified API health (200), empty product list (200), and empty categories (200); the storefront collection route renders the empty state. No workflow tests were added or run.
 - The latest full `npm audit` reports 22 advisories: **3 high, 18 moderate, and 1 low** (including transitive Multer/PostCSS advisories). These remain open before production. See `TODO.md`.
 - No workflow tests have been added or run. Build success validates compilation only, not business correctness, security, or production readiness.
+
+## Phase 3 — initial admin access and review screens
+
+**Status: authentication-backed admin shell, overview, and read-only product table implemented.**
+
+- Added administrator sign-in/out and session lookup using bcrypt password verification and opaque, random database sessions stored as SHA-256 hashes. Session cookies are HttpOnly and SameSite=Strict; production cookies are Secure.
+- Added a terminal-only `npm run admin:create` command that prompts without echoing the password, requires 12 or more characters, creates an OWNER, and records the initial audit event. No shared/default account was created.
+- Added protected `GET /api/v1/admin/overview` and `GET /api/v1/admin/products` APIs. Dashboard totals and product rows come from PostgreSQL. Role allowlists are enforced server-side.
+- Added `/admin/login`, `/admin`, and `/admin/products` responsive pages. The first catalog admin screen is read-only; create/edit/archive, categories, stock adjustments, and movements remain unimplemented.
+- `npm run build` passed for the Nest API and Next.js web app, including all three admin routes. End-to-end sign-in remains unverified until an owner account is provisioned in the local database; no workflow tests have been added or run.
+- Security follow-up remains: login throttling, automated authentication/authorization tests, comprehensive audit events, and a production security review.
 - Started the local Next.js and NestJS development servers. Verified the storefront collection route and API endpoints. The preview is available at `http://127.0.0.1:3000/collection`.
 - `git remote -v` is empty, and the connected GitHub repository search returned no matching TakeoGemstones/GemStone repository. There is no destination configured, so no GitHub push has happened.
 

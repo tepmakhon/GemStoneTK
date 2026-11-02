@@ -1,6 +1,6 @@
 # Requirements traceability
 
-This is the initial planning baseline for the user-provided gemstone platform brief. `Planned` means not implemented. Tests named here are acceptance coverage to add when the corresponding module is built; no tests exist yet.
+This maps the user-provided gemstone platform brief to the current incremental implementation. Tests listed are required acceptance coverage; no automated workflow test suite exists yet.
 
 | Requirement area | Planned implementation | Planned verification | State |
 |---|---|---|---|
@@ -15,11 +15,11 @@ This is the initial planning baseline for the user-provided gemstone platform br
 | Inquiries and quotations | Contact/inquiry channels and product linkage; quote numbering, lines, expiry, status, acceptance-to-order workflow | Inquiry/quote workflow tests, expiry and stock recheck tests | Planned |
 | International requests | Inquiry workflow only until shipping coverage is confirmed | Assert unsupported destinations cannot enter shipping checkout | Planned |
 | Customer accounts | Secure registration/login/recovery, addresses, profile and order history | Authentication, password reset, authorization and account-data tests | Planned |
-| Admin and permissions | Dashboard, products/categories, inventory/shop sales, orders/payments, customers, inquiries/quotes, fulfillment, media, reports, settings, users/roles, audit | Role matrix and CRUD/workflow integration tests for each module | Planned |
+| Admin and permissions | Admin sign-in/out, bcrypt verification, opaque DB-backed sessions, role-guarded overview and read-only product list, responsive dashboard shell; remaining modules in TODO | Auth/session/role tests and CRUD/workflow integration tests for each module | Initial secure review slice implemented; auth flow needs a provisioned account for live verification |
 | Spreadsheet import | CSV/XLSX template, validation preview, duplicate detection, row errors, commit, history and summary | Tests for valid/invalid files, duplicate SKUs, partial row errors, and no silent skips | Planned |
 | Currency | Configurable USD base and KHR display conversion with persisted configuration and rounding rules | Tests for rate update, conversion and display; no hard-coded exchange rate | Planned; source/update policy needs owner decision |
 | Database integrity | PostgreSQL/Prisma normalized schema, indexes, decimal money, FKs, historical snapshots, and migration | Initial migration applied to local PostgreSQL; migration/constraint tests and further constraints remain planned | Initial schema applied |
-| Security | Password hashing, roles, DTO validation, rate limits, secure sessions/tokens, upload restrictions, CORS/CSRF protections as appropriate, safe errors, secrets and audit | Auth/authorization, input/upload, rate-limit and audit tests; security review | Planned |
+| Security | Admin bcrypt password verification, SHA-256 hashed opaque session tokens, HttpOnly/SameSite cookies, role guards, DTO validation, configured CORS, safe generic login errors; rate limiting and broader controls remain | Auth/authorization, input/upload, rate-limit and audit tests; security review | Initial admin access controls implemented; remaining controls planned |
 | Performance and accessibility | Optimized responsive pages, lazy images, pagination/caching where appropriate, semantic accessible UI | Accessibility review and representative performance checks | Planned |
 | Documentation and deployment | README, env example, architecture/API, migrations/seeding, testing, admin/deployment guides, Docker configuration | Follow documented clean setup/migrate/seed/launch procedure | Planned |
 

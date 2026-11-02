@@ -21,6 +21,7 @@
     "build": "npm run build --workspaces --if-present",
     "db:generate": "npm run generate --workspace @takeo/database",
     "db:migrate": "npm run migrate:dev --workspace @takeo/database",
-    "db:deploy": "npm run migrate:deploy --workspace @takeo/database"
+    "db:deploy": "npm run migrate:deploy --workspace @takeo/database",
+    "admin:create": "node scripts/create-admin.mjs"
   }
 }
