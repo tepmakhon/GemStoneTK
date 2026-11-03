@@ -63,9 +63,12 @@ See [REQUIREMENTS_TRACEABILITY.md](./REQUIREMENTS_TRACEABILITY.md) for the requi
 - Added administrator sign-in/out and session lookup using bcrypt password verification and opaque, random database sessions stored as SHA-256 hashes. Session cookies are HttpOnly and SameSite=Strict; production cookies are Secure.
 - Added a terminal-only `npm run admin:create` command that prompts without echoing the password, requires 12 or more characters, creates an OWNER, and records the initial audit event. No shared/default account was created.
 - Added protected `GET /api/v1/admin/overview` and `GET /api/v1/admin/products` APIs. Dashboard totals and product rows come from PostgreSQL. Role allowlists are enforced server-side.
-- Added `/admin/login`, `/admin`, and `/admin/products` responsive pages. The first catalog admin screen is read-only; create/edit/archive, categories, stock adjustments, and movements remain unimplemented.
+- Added `/admin/login`, `/admin`, and `/admin/products` responsive pages. Product details are read-only; create/edit/archive and category management remain unimplemented.
+- Added guarded inventory adjustment and shop-sale endpoints plus an inventory history screen. Each operation locks the product row, checks active reservation quantities, then writes the new on-hand count, movement ledger row, and audit entry in a serializable transaction.
 - `npm run build` passed for the Nest API and Next.js web app, including all three admin routes. End-to-end sign-in remains unverified until an owner account is provisioned in the local database; no workflow tests have been added or run.
-- Security follow-up remains: login throttling, automated authentication/authorization tests, comprehensive audit events, and a production security review.
+- Provisioned the owner account requested by the user in the local database; the password is bcrypt-hashed and was not added to repository files.
+- `npm run build` passed for API and web after the inventory work. Manual API checks confirmed unauthenticated admin endpoints return 401; the authenticated stock/sale transaction still needs workflow tests with a product fixture.
+- Security follow-up remains: login throttling, automated authentication/authorization and inventory concurrency tests, comprehensive audit events, and a production security review.
 - Started the local Next.js and NestJS development servers. Verified the storefront collection route and API endpoints. The preview is available at `http://127.0.0.1:3000/collection`.
 - `git remote -v` is empty, and the connected GitHub repository search returned no matching TakeoGemstones/GemStone repository. There is no destination configured, so no GitHub push has happened.
 

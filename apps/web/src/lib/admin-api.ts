@@ -8,7 +8,9 @@ export async function adminFetch<T>(path: string, init?: RequestInit): Promise<T
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   });
   if (!response.ok) {
-    const error = new Error(response.status === 401 ? 'Your administrator session has expired.' : 'The admin service could not complete this request.') as Error & { status?: number };
+    const result = await response.json().catch(() => null) as { message?: string | string[] } | null;
+    const message = Array.isArray(result?.message) ? result.message.join(' ') : result?.message;
+    const error = new Error(response.status === 401 ? 'Your administrator session has expired.' : message ?? 'The admin service could not complete this request.') as Error & { status?: number };
     error.status = response.status;
     throw error;
   }
@@ -25,4 +27,8 @@ export type AdminOverview = {
 export type AdminProduct = {
   id: string; sku: string; name: string; status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'; pricingMethod: 'FIXED' | 'NEGOTIABLE' | 'CONTACT';
   price: string | null; currency: string; onHand: number; reserved: number; categories: string[]; updatedAt: string;
+};
+export type InventoryMovement = {
+  id: string; productId: string; sku: string; productName: string; type: 'RECEIPT' | 'RESERVATION' | 'RELEASE' | 'SALE' | 'RETURN' | 'ADJUSTMENT';
+  onHandDelta: number; reservedDelta: number; reason: string; reference: string | null; actor: string; createdAt: string;
 };

@@ -19,9 +19,9 @@
 - [x] Implement the first admin authentication/role-control slice (login/logout, persisted sessions, guarded overview and product-list endpoints).
 - [ ] Add authentication and authorization integration tests, rate limiting, recovery, and session management UI.
 - [x] Implement the first read-only catalog endpoints and collection/detail pages.
-- [ ] Implement product media delivery, transactional inventory ledger/reservations, and physical-shop sale flow.
+- [ ] Implement product media delivery, online transactional reservations/checkout, returns, and inventory tests. Admin physical-shop sale, stock adjustment, ledger and audit writes are implemented.
 - [ ] Implement cart, checkout, orders, payment review, inquiries, and quotations.
-- [ ] Add product create/edit/archive, categories, inventory/shop sales, orders, payments, customers, inquiries/quotes, fulfillment, media, reports, settings, and spreadsheet import to the admin.
+- [ ] Add product create/edit/archive, categories, orders, payments, customers, inquiries/quotes, fulfillment, media, reports, settings, and spreadsheet import to the admin. Product stock adjustment and physical-shop sale are implemented.
 - [ ] Implement bilingual SEO-ready storefront matching desktop/mobile Figma screens.
 - [ ] Add the unit, API, concurrency, import, and workflow tests listed in traceability; run them during implementation.
 - [ ] Write setup, API, admin, security, and deployment documentation.

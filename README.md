@@ -1,6 +1,6 @@
 # Takeo Natural Gemstones platform
 
-The repository contains an incremental foundation for the bilingual gemstone storefront and business operations platform. It is not yet a production-ready commerce system: checkout, inventory mutations, order/payment workflows, file storage, and most admin modules remain outstanding.
+The repository contains an incremental foundation for the bilingual gemstone storefront and business operations platform. It is not yet a production-ready commerce system: product editing, checkout, online reservations, order/payment workflows, file storage, and most admin modules remain outstanding.
 
 ## Stack
 
@@ -35,15 +35,21 @@ npm run admin:create
 
 The command prompts for an email, display name, and a password of at least 12 characters (password input is hidden). It hashes the password with bcrypt and records an audit event. There is no default administrator account or password.
 
-The initial protected admin slice is at `/admin`: sign-in, overview metrics, and a searchable, paginated product list. Product views are read-only in this slice. Supported API routes:
+The protected admin slice is at `/admin`: sign-in, overview metrics, a searchable, paginated product list, inventory adjustments, physical-shop sales, and movement history. Product details remain read-only. Supported API routes:
 
 - `POST /api/v1/admin/auth/login`
 - `GET /api/v1/admin/auth/me`
 - `POST /api/v1/admin/auth/logout`
 - `GET /api/v1/admin/overview`
 - `GET /api/v1/admin/products`
+- `POST /api/v1/admin/products/:id/inventory-adjustments`
+- `POST /api/v1/admin/products/:id/shop-sales`
+- `GET /api/v1/admin/inventory/movements`
+- `GET /api/v1/admin/products/:id/inventory-movements`
 
 Admin sessions are opaque random tokens stored as SHA-256 hashes in the database and sent in an HttpOnly, SameSite=Strict cookie. Passwords use bcrypt. The overview and product list enforce role allowlists. Rate limiting and broader security review remain outstanding before any public deployment.
+
+Inventory operations lock the product row, prevent adjustments or shop sales from consuming reserved units, and write the stock update, movement entry, and audit event in one serializable transaction.
 
 ## Catalog API
 

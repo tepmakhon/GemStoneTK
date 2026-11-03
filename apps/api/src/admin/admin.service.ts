@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { AdminProductsQueryDto } from './admin-products-query.dto';
+import { InventoryAdjustmentDto, InventoryMovementsQueryDto, ShopSaleDto } from './inventory.dto';
 
 @Injectable()
 export class AdminService {
@@ -86,5 +87,129 @@ export class AdminService {
       })),
       pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
     };
+  }
+
+  async adjustInventory(adminUserId: string, productId: string, input: InventoryAdjustmentDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const product = await this.lockProductRow(tx, productId);
+      const reservations = await tx.inventoryReservation.aggregate({
+        where: { productId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
+        _sum: { quantity: true },
+      });
+      const reserved = reservations._sum.quantity ?? 0;
+      const nextOnHand = product.onHand + input.delta;
+      if (nextOnHand < reserved) {
+        throw new ConflictException(`The adjustment would leave fewer units than the ${reserved} active reservation(s).`);
+      }
+
+      await tx.product.update({ where: { id: productId }, data: { onHand: nextOnHand } });
+      const movement = await tx.inventoryMovement.create({
+        data: {
+          productId,
+          adminUserId,
+          type: input.delta > 0 ? 'RECEIPT' : 'ADJUSTMENT',
+          onHandDelta: input.delta,
+          reason: input.reason,
+          reference: input.reference?.trim() || null,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          adminUserId,
+          action: 'INVENTORY_ADJUSTED',
+          entityType: 'Product',
+          entityId: productId,
+          details: { sku: product.sku, delta: input.delta, resultingOnHand: nextOnHand, reason: input.reason } satisfies Prisma.InputJsonObject,
+        },
+      });
+      return { movementId: movement.id, sku: product.sku, onHand: nextOnHand, reserved, available: nextOnHand - reserved };
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  }
+
+  async recordShopSale(adminUserId: string, productId: string, input: ShopSaleDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const product = await this.lockProductRow(tx, productId);
+      const reservations = await tx.inventoryReservation.aggregate({
+        where: { productId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
+        _sum: { quantity: true },
+      });
+      const reserved = reservations._sum.quantity ?? 0;
+      const available = product.onHand - reserved;
+      if (input.quantity > available) {
+        throw new ConflictException(`Only ${Math.max(0, available)} unreserved unit(s) are available for a shop sale.`);
+      }
+      const nextOnHand = product.onHand - input.quantity;
+
+      await tx.product.update({ where: { id: productId }, data: { onHand: nextOnHand } });
+      const movement = await tx.inventoryMovement.create({
+        data: {
+          productId,
+          adminUserId,
+          type: 'SALE',
+          onHandDelta: -input.quantity,
+          reason: input.reason,
+          reference: input.reference?.trim() || null,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          adminUserId,
+          action: 'SHOP_SALE_RECORDED',
+          entityType: 'Product',
+          entityId: productId,
+          details: { sku: product.sku, quantity: input.quantity, resultingOnHand: nextOnHand, reason: input.reason } satisfies Prisma.InputJsonObject,
+        },
+      });
+      return { movementId: movement.id, sku: product.sku, soldQuantity: input.quantity, onHand: nextOnHand, reserved, available: nextOnHand - reserved };
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  }
+
+  async listInventoryMovements(query: InventoryMovementsQueryDto, productId?: string) {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 25;
+    const where: Prisma.InventoryMovementWhereInput = productId ? { productId } : {};
+    if (productId && !(await this.prisma.product.findUnique({ where: { id: productId }, select: { id: true } }))) {
+      throw new NotFoundException('Product not found.');
+    }
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.inventoryMovement.findMany({
+        where,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          product: { select: { id: true, sku: true, translations: { where: { locale: 'en' }, select: { name: true }, take: 1 } } },
+          adminUser: { select: { fullName: true } },
+        },
+      }),
+      this.prisma.inventoryMovement.count({ where }),
+    ]);
+    return {
+      items: items.map((item) => ({
+        id: item.id,
+        productId: item.product.id,
+        sku: item.product.sku,
+        productName: item.product.translations[0]?.name ?? item.product.sku,
+        type: item.type,
+        onHandDelta: item.onHandDelta,
+        reservedDelta: item.reservedDelta,
+        reason: item.reason,
+        reference: item.reference,
+        actor: item.adminUser?.fullName ?? 'Administrator',
+        createdAt: item.createdAt,
+      })),
+      pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
+    };
+  }
+
+  private async lockProductRow(tx: Prisma.TransactionClient, productId: string) {
+    const [product] = await tx.$queryRaw<Array<{ id: string; sku: string; onHand: number; archivedAt: Date | null }>>`
+      SELECT "id", "sku", "onHand", "archivedAt"
+      FROM "Product"
+      WHERE "id" = ${productId}
+      FOR UPDATE
+    `;
+    if (!product || product.archivedAt) throw new NotFoundException('Product not found.');
+    return product;
   }
 }
